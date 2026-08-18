@@ -1,5 +1,8 @@
 # What Did I Do?
 
+[![Validate][validate-badge]][validate-workflow]
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 ![Code changes becoming a concise summary before Git push](assets/what-did-i-do-hero.png)
 
 > Turn Git changes into a short, accurate explanation before a push or whenever
@@ -23,7 +26,20 @@ uncommitted local work are always kept separate.
 
 ## Install
 
-Clone the repository into the skill directory used by your coding agent.
+Install globally for all agents detected by the open-source
+[`skills`](https://github.com/vercel-labs/skills) CLI:
+
+```bash
+npx skills add Noverse0/what-did-i-do -g --all
+```
+
+To inspect the package before installing it:
+
+```bash
+npx skills add Noverse0/what-did-i-do --list
+```
+
+Manual installation is also available for each client.
 
 ### Codex and Agent Skills clients
 
@@ -122,20 +138,63 @@ Git hook if you need terminal-level automation.
 
 No third-party Python packages are required.
 
+## Development
+
+Run the same checks used by CI:
+
+```bash
+python3 -m unittest discover -s tests -v
+ruff check scripts tests
+ruff format --check scripts tests
+npx --yes markdownlint-cli2@0.23.2 "**/*.md"
+npx --yes skills@1.5.22 add . --list
+```
+
+Agent-level behavior cases live in [`evals/cases.json`](evals/cases.json). They cover
+working-tree, outgoing-push, clean-repository, and missing-upstream behavior.
+
 ## Structure
 
 ```text
 what-did-i-do/
+├── .github/workflows/validate.yml
+├── LICENSE
+├── README.md
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
 ├── assets/
+│   ├── icon-large.png
+│   ├── icon-small.png
 │   └── what-did-i-do-hero.png
+├── evals/
+│   └── cases.json
 ├── references/
 │   └── compatibility.md
-└── scripts/
-    └── collect_change_context.py
+├── scripts/
+│   └── collect_change_context.py
+└── tests/
+    ├── test_collect_change_context.py
+    └── test_skill_package.py
 ```
 
 See [agent compatibility](references/compatibility.md) for platform-specific
 discovery and invocation details.
+
+## Reference skill repositories
+
+This package follows the same progressive-disclosure pattern used by established skill libraries:
+a compact `SKILL.md` at the root, with scripts, references, assets, and product metadata loaded only
+when needed.
+
+- [OpenAI Skills](https://github.com/openai/skills)
+- [Anthropic Skills](https://github.com/anthropics/skills)
+- [Vercel Agent Skills](https://github.com/vercel-labs/agent-skills)
+- [Agent Skills specification](https://agentskills.io/specification)
+
+## License
+
+[MIT](LICENSE) © 2026 Noverse0
+
+[validate-badge]: https://github.com/Noverse0/what-did-i-do/actions/workflows/validate.yml/badge.svg
+[validate-workflow]: https://github.com/Noverse0/what-did-i-do/actions/workflows/validate.yml

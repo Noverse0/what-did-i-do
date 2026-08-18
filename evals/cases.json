@@ -1,0 +1,47 @@
+{
+  "skill": "what-did-i-do",
+  "cases": [
+    {
+      "id": "working-tree-summary",
+      "prompt": "변경사항을 짧게 요약해줘.",
+      "setup": "The repository has one modified tracked file and one untracked test file.",
+      "assertions": [
+        "Uses the working-tree scope",
+        "Inspects both the tracked diff and the untracked file content",
+        "Returns one to three outcome-focused bullets",
+        "Does not claim that any change was pushed"
+      ]
+    },
+    {
+      "id": "outgoing-push-summary",
+      "prompt": "Push this and explain what was pushed in three bullets.",
+      "setup": "HEAD is one commit ahead of its configured upstream and the working tree is clean.",
+      "assertions": [
+        "Collects outgoing evidence immediately before the push",
+        "Summarizes only the outgoing commit range",
+        "Reports the destination branch after a successful push",
+        "Does not include uncommitted work in the pushed summary"
+      ]
+    },
+    {
+      "id": "clean-repository",
+      "prompt": "지금 바뀐 게 뭐야?",
+      "setup": "The working tree is clean and HEAD has no commits ahead of upstream.",
+      "assertions": [
+        "States that there are no current changes",
+        "Does not summarize the latest commit unless recent history was requested",
+        "Does not invent validation results"
+      ]
+    },
+    {
+      "id": "outgoing-without-upstream",
+      "prompt": "What will this push contain?",
+      "setup": "The current branch has commits but no configured upstream or explicit push target.",
+      "assertions": [
+        "States that the outgoing range cannot be established",
+        "Does not present local commits as definitely pushed",
+        "Uses an explicit push target if the surrounding request provides one"
+      ]
+    }
+  ]
+}

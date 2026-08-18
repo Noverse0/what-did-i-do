@@ -1,4 +1,7 @@
 interface:
   display_name: "What Did I Do?"
   short_description: "Summarize code changes before push or on request"
+  icon_small: "./assets/icon-small.png"
+  icon_large: "./assets/icon-large.png"
+  brand_color: "#07142E"
   default_prompt: "Use $what-did-i-do to explain my current code changes briefly."
