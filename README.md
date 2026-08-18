@@ -1,14 +1,13 @@
-# What Did I Do?
+# What Did AI Do?
 
 [![Validate][validate-badge]][validate-workflow]
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-![Code changes becoming a concise summary before Git push](assets/what-did-i-do-hero.png)
+![AI code changes becoming a concise summary before Git push](assets/what-did-ai-do-hero.png)
 
-> Turn Git changes into a short, accurate explanation before a push or whenever
-> you ask.
+> Your AI changed the code. Know what actually changed.
 
-`what-did-i-do` is a portable Agent Skill for Codex, Claude Code, Gemini CLI,
+`what-did-ai-do` is a portable Agent Skill for Codex, Claude Code, Gemini CLI,
 and other clients that support the
 [Agent Skills specification](https://agentskills.io/specification).
 
@@ -30,13 +29,13 @@ Install globally for all agents detected by the open-source
 [`skills`](https://github.com/vercel-labs/skills) CLI:
 
 ```bash
-npx skills add Noverse0/what-did-i-do -g --all
+npx skills add Noverse0/what-did-ai-do -g --all
 ```
 
 To inspect the package before installing it:
 
 ```bash
-npx skills add Noverse0/what-did-i-do --list
+npx skills add Noverse0/what-did-ai-do --list
 ```
 
 Manual installation is also available for each client.
@@ -44,29 +43,29 @@ Manual installation is also available for each client.
 ### Codex and Agent Skills clients
 
 ```bash
-git clone https://github.com/Noverse0/what-did-i-do.git \
-  ~/.agents/skills/what-did-i-do
+git clone https://github.com/Noverse0/what-did-ai-do.git \
+  ~/.agents/skills/what-did-ai-do
 ```
 
 OMX installations that use the Codex-specific skill root can install it with:
 
 ```bash
-git clone https://github.com/Noverse0/what-did-i-do.git \
-  ~/.codex/skills/what-did-i-do
+git clone https://github.com/Noverse0/what-did-ai-do.git \
+  ~/.codex/skills/what-did-ai-do
 ```
 
 ### Claude Code
 
 ```bash
-git clone https://github.com/Noverse0/what-did-i-do.git \
-  ~/.claude/skills/what-did-i-do
+git clone https://github.com/Noverse0/what-did-ai-do.git \
+  ~/.claude/skills/what-did-ai-do
 ```
 
 ### Gemini CLI
 
 ```bash
-git clone https://github.com/Noverse0/what-did-i-do.git \
-  ~/.gemini/skills/what-did-i-do
+git clone https://github.com/Noverse0/what-did-ai-do.git \
+  ~/.gemini/skills/what-did-ai-do
 ```
 
 For project-only installation, replace the user-level prefix with
@@ -77,17 +76,17 @@ For project-only installation, replace the user-level prefix with
 Ask naturally after making changes:
 
 ```text
-What did I change? Keep it short.
+What did the AI change? Keep it short.
 Push this and explain what was pushed in three bullets.
-변경사항을 짧게 요약해줘.
+AI가 바꾼 코드를 짧게 요약해줘.
 수정한 내용을 push하고 무엇이 바뀌었는지 알려줘.
 ```
 
 Explicit invocation is also available where the client supports it:
 
 ```text
-$what-did-i-do Summarize my current changes.
-/what-did-i-do
+$what-did-ai-do Summarize my current changes.
+/what-did-ai-do
 ```
 
 Example output:
@@ -156,7 +155,7 @@ working-tree, outgoing-push, clean-repository, and missing-upstream behavior.
 ## Structure
 
 ```text
-what-did-i-do/
+what-did-ai-do/
 ├── .github/workflows/validate.yml
 ├── LICENSE
 ├── README.md
@@ -166,7 +165,7 @@ what-did-i-do/
 ├── assets/
 │   ├── icon-large.png
 │   ├── icon-small.png
-│   └── what-did-i-do-hero.png
+│   └── what-did-ai-do-hero.png
 ├── evals/
 │   └── cases.json
 ├── references/
@@ -196,5 +195,5 @@ when needed.
 
 [MIT](LICENSE) © 2026 Noverse0
 
-[validate-badge]: https://github.com/Noverse0/what-did-i-do/actions/workflows/validate.yml/badge.svg
-[validate-workflow]: https://github.com/Noverse0/what-did-i-do/actions/workflows/validate.yml
+[validate-badge]: https://github.com/Noverse0/what-did-ai-do/actions/workflows/validate.yml/badge.svg
+[validate-workflow]: https://github.com/Noverse0/what-did-ai-do/actions/workflows/validate.yml

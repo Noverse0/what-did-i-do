@@ -13,9 +13,9 @@ optional and must not change the portable workflow.
 
 | Agent | Project scope | User scope | Invocation notes |
 | --- | --- | --- | --- |
-| OpenAI Codex | `.agents/skills/what-did-i-do/` | `$HOME/.agents/skills/what-did-i-do/` | Invoke explicitly from the skills UI/command surface or let the description trigger it implicitly. `agents/openai.yaml` supplies optional OpenAI UI metadata. OMX installations may instead use their configured `.codex/skills` root. |
-| Claude Code | `.claude/skills/what-did-i-do/` | `$HOME/.claude/skills/what-did-i-do/` | Invoke as `/what-did-i-do` or let Claude select it from the description. |
-| Gemini CLI | `.gemini/skills/what-did-i-do/` or `.agents/skills/what-did-i-do/` | `$HOME/.gemini/skills/what-did-i-do/` or `$HOME/.agents/skills/what-did-i-do/` | Gemini discovers metadata, then activates a matching skill with user consent. Use `/skills` or `gemini skills` to manage installed skills. |
+| OpenAI Codex | `.agents/skills/what-did-ai-do/` | `$HOME/.agents/skills/what-did-ai-do/` | Invoke explicitly from the skills UI/command surface or let the description trigger it implicitly. `agents/openai.yaml` supplies optional OpenAI UI metadata. OMX installations may instead use their configured `.codex/skills` root. |
+| Claude Code | `.claude/skills/what-did-ai-do/` | `$HOME/.claude/skills/what-did-ai-do/` | Invoke as `/what-did-ai-do` or let Claude select it from the description. |
+| Gemini CLI | `.gemini/skills/what-did-ai-do/` or `.agents/skills/what-did-ai-do/` | `$HOME/.gemini/skills/what-did-ai-do/` or `$HOME/.agents/skills/what-did-ai-do/` | Gemini discovers metadata, then activates a matching skill with user consent. Use `/skills` or `gemini skills` to manage installed skills. |
 
 Keep platform-only frontmatter out of the shared `SKILL.md`. Claude options such as
 `disable-model-invocation`, for example, reduce portability. Prefer a platform wrapper only when

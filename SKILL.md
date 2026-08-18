@@ -1,12 +1,12 @@
 ---
-name: what-did-i-do
+name: what-did-ai-do
 description: >-
-  Summarize code changes briefly and accurately from Git evidence. Use after an agent edits code
-  when the user asks what changed, requests a concise change summary, prepares a commit or handoff,
-  or asks to push or publish changes and needs a short explanation of what was actually pushed.
+  Summarize code changes briefly and accurately from Git evidence. Use after an AI coding agent
+  edits code when the user asks what changed, requests a concise change summary, prepares a commit
+  or handoff, or asks to push or publish changes and needs a short explanation of what was pushed.
 ---
 
-# What Did I Do
+# What Did AI Do
 
 Explain completed code changes in plain language without inventing intent. Keep the final summary
 short enough to scan immediately.

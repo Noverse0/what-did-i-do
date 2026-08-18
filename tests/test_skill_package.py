@@ -9,6 +9,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SkillPackageTests(unittest.TestCase):
+    def test_skill_directory_matches_skill_name(self) -> None:
+        self.assertEqual(ROOT.name, "what-did-ai-do")
+
     def test_skill_frontmatter_is_portable(self) -> None:
         content = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(content.startswith("---\n"))
@@ -19,7 +22,7 @@ class SkillPackageTests(unittest.TestCase):
             if (match := re.match(r"^([a-z_]+):", line))
         }
         self.assertEqual(keys, {"name", "description"})
-        self.assertIn("name: what-did-i-do", frontmatter)
+        self.assertIn("name: what-did-ai-do", frontmatter)
         self.assertLessEqual(len(content.splitlines()), 500)
 
     def test_local_markdown_links_exist(self) -> None:
@@ -44,7 +47,7 @@ class SkillPackageTests(unittest.TestCase):
         payload = json.loads(
             (ROOT / "evals" / "cases.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(payload["skill"], "what-did-i-do")
+        self.assertEqual(payload["skill"], "what-did-ai-do")
         case_ids = {case["id"] for case in payload["cases"]}
         self.assertEqual(
             case_ids,
