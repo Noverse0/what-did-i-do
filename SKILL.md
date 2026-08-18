@@ -17,7 +17,7 @@ short enough to scan immediately.
 2. Choose exactly one summary scope:
    - For a general change-summary request, use `auto`.
    - Before or after a push, use `outgoing` so the summary covers only commits ahead of the
-     upstream branch.
+     push destination (the script prefers `@{push}` and falls back to `@{upstream}`).
    - For uncommitted work only, use `working`.
    - For the most recent commit only, use `last`.
 3. Run:
@@ -27,10 +27,18 @@ short enough to scan immediately.
      --mode <auto|outgoing|working|last>
    ```
 
+   Use `python` instead of `python3` on systems, such as Windows, where only `python` is
+   available.
+
 4. Read the actual relevant diff before summarizing:
    - Working tree: `git diff --cached` and `git diff`
-   - Outgoing commits: `git diff <upstream>...HEAD`
+   - Outgoing commits: `git diff <target>...HEAD`, where `<target>` is the push target or
+     upstream reported by the script
    - Last commit: `git show --format=fuller HEAD`
+
+   For large diffs, read the stat first and then per-file diffs for the files that matter,
+   instead of loading the entire diff at once.
+
 5. Inspect important new files reported as untracked because ordinary `git diff` does not include
    their content.
 
@@ -50,13 +58,14 @@ summary.
 
 Default to the user's language. Describe outcomes rather than a file-by-file diary.
 
-Use this shape unless the user asks for another format:
+Use this shape unless the user asks for another format, translating the heading and labels into
+the user's language:
 
 ```text
-변경 요약
-- [사용자 또는 시스템 관점의 핵심 변화]
-- [필요할 때만 두 번째 변화]
-- 검증: [실제로 실행한 검사와 결과]
+Change summary
+- [Key change from the user's or system's perspective]
+- [Second change only when needed]
+- Validation: [checks actually run and their results]
 ```
 
 Apply these limits:

@@ -107,7 +107,7 @@ to inspect the corresponding diff before writing the summary.
 | --- | --- |
 | `auto` | Working tree first, then outgoing commits, then the latest commit |
 | `working` | Staged, unstaged, and untracked changes |
-| `outgoing` | Commits ahead of the configured upstream branch |
+| `outgoing` | Commits ahead of the push destination (`@{push}`, else `@{upstream}`) |
 | `last` | The most recent commit |
 
 Run the evidence collector directly when debugging or adapting the skill:
@@ -150,7 +150,9 @@ npx --yes skills@1.5.22 add . --list
 ```
 
 Agent-level behavior cases live in [`evals/cases.json`](evals/cases.json). They cover
-working-tree, outgoing-push, clean-repository, and missing-upstream behavior.
+working-tree, outgoing-push, clean-repository, and missing-upstream behavior. There is no
+automated runner yet: reproduce each case's `setup` in a scratch repository, send the `prompt`
+to an agent with the skill installed, and check every `assertions` entry manually.
 
 ## Structure
 
