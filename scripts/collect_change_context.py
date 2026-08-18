@@ -10,6 +10,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+MAX_SECTION_LINES = 200
+
 
 class GitError(RuntimeError):
     """Raised when required Git evidence cannot be collected."""
@@ -20,6 +22,7 @@ class Repository:
     root: Path
     branch: str
     upstream: str | None
+    push_target: str | None
 
 
 def run_git(
@@ -30,7 +33,8 @@ def run_git(
         cwd=cwd,
         check=False,
         capture_output=True,
-        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     if result.returncode != 0:
         if required:
@@ -40,23 +44,56 @@ def run_git(
     return result.stdout.rstrip()
 
 
+def resolve_tracking_ref(root: Path, spec: str) -> str | None:
+    """Resolve @{upstream} or @{push} to a ref that actually exists."""
+    name = run_git(
+        ["rev-parse", "--abbrev-ref", "--symbolic-full-name", spec],
+        cwd=root,
+        required=False,
+    )
+    if not name:
+        return None
+    # @{push} can name a ref that was never fetched or pushed yet.
+    if not run_git(
+        ["rev-parse", "--verify", "--quiet", f"{name}^{{commit}}"],
+        cwd=root,
+        required=False,
+    ):
+        return None
+    return name
+
+
 def discover_repository(start: Path) -> Repository:
     root_text = run_git(["rev-parse", "--show-toplevel"], cwd=start)
     root = Path(root_text).resolve()
     branch = run_git(["branch", "--show-current"], cwd=root, required=False)
     if not branch:
         branch = "(detached HEAD)"
-    upstream = run_git(
-        ["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}"],
-        cwd=root,
-        required=False,
+    upstream = resolve_tracking_ref(root, "@{upstream}")
+    push_target = resolve_tracking_ref(root, "@{push}")
+    return Repository(
+        root=root, branch=branch, upstream=upstream, push_target=push_target
     )
-    return Repository(root=root, branch=branch, upstream=upstream or None)
+
+
+def outgoing_target(repo: Repository) -> str | None:
+    """Where a push would land: prefer @{push} over @{upstream}."""
+    return repo.push_target or repo.upstream
 
 
 def has_head(repo: Repository) -> bool:
     return bool(
         run_git(["rev-parse", "--verify", "HEAD"], cwd=repo.root, required=False)
+    )
+
+
+def is_merge_commit(repo: Repository) -> bool:
+    return bool(
+        run_git(
+            ["rev-parse", "--verify", "--quiet", "HEAD^2"],
+            cwd=repo.root,
+            required=False,
+        )
     )
 
 
@@ -67,9 +104,10 @@ def has_working_changes(repo: Repository) -> bool:
 
 
 def outgoing_count(repo: Repository) -> int:
-    if not repo.upstream or not has_head(repo):
+    target = outgoing_target(repo)
+    if not target or not has_head(repo):
         return 0
-    value = run_git(["rev-list", "--count", f"{repo.upstream}..HEAD"], cwd=repo.root)
+    value = run_git(["rev-list", "--count", f"{target}..HEAD"], cwd=repo.root)
     return int(value)
 
 
@@ -85,7 +123,11 @@ def choose_mode(requested: str, repo: Repository) -> str:
 
 def section(title: str, content: str) -> str:
     body = content.strip() or "(none)"
-    return f"## {title}\n{body}"
+    lines = body.splitlines()
+    if len(lines) > MAX_SECTION_LINES:
+        omitted = len(lines) - MAX_SECTION_LINES
+        lines = [*lines[:MAX_SECTION_LINES], f"... ({omitted} more lines omitted)"]
+    return "\n".join([f"## {title}", *lines])
 
 
 def collect_working(repo: Repository) -> list[str]:
@@ -114,13 +156,14 @@ def collect_working(repo: Repository) -> list[str]:
 
 
 def collect_outgoing(repo: Repository) -> list[str]:
-    if not repo.upstream:
+    target = outgoing_target(repo)
+    if not target:
         return [
             section("Warning", "No upstream branch is configured."),
             section("Outgoing commits", "(unknown without an explicit push target)"),
         ]
-    revision = f"{repo.upstream}..HEAD"
-    comparison = f"{repo.upstream}...HEAD"
+    revision = f"{target}..HEAD"
+    comparison = f"{target}...HEAD"
     return [
         section(
             "Outgoing commits",
@@ -140,31 +183,49 @@ def collect_outgoing(repo: Repository) -> list[str]:
 def collect_last(repo: Repository) -> list[str]:
     if not has_head(repo):
         return [section("Last commit", "(repository has no commits)")]
-    return [
+    details = [
         section(
             "Last commit",
             run_git(["log", "-1", "--format=%h%x09%s"], cwd=repo.root),
-        ),
-        section(
-            "Last commit files",
-            run_git(
-                [
-                    "diff-tree",
-                    "--root",
-                    "--no-commit-id",
-                    "--name-status",
-                    "-r",
-                    "-M",
-                    "HEAD",
-                ],
-                cwd=repo.root,
-            ),
-        ),
-        section(
-            "Last commit stat",
-            run_git(["show", "--stat", "--format=", "-M", "HEAD"], cwd=repo.root),
-        ),
+        )
     ]
+    if is_merge_commit(repo):
+        # diff-tree -m reports every parent, so pin the first-parent diff
+        # explicitly and say so instead of returning misleading evidence.
+        details.append(
+            section(
+                "Note",
+                "HEAD is a merge commit; file lists show the first-parent diff.",
+            )
+        )
+        file_args = [
+            "diff-tree",
+            "--no-commit-id",
+            "--name-status",
+            "-r",
+            "-M",
+            "HEAD^",
+            "HEAD",
+        ]
+        stat_args = ["diff", "--stat", "-M", "HEAD^", "HEAD"]
+    else:
+        file_args = [
+            "diff-tree",
+            "--root",
+            "--no-commit-id",
+            "--name-status",
+            "-r",
+            "-M",
+            "HEAD",
+        ]
+        stat_args = ["show", "--stat", "--format=", "-M", "HEAD"]
+    details.extend(
+        [
+            section("Last commit files", run_git(file_args, cwd=repo.root)),
+            section("Last commit stat", run_git(stat_args, cwd=repo.root)),
+        ]
+    )
+    return details
 
 
 def parse_args() -> argparse.Namespace:
@@ -204,8 +265,10 @@ def main() -> int:
         f"repository: {repo.root}",
         f"branch: {repo.branch}",
         f"upstream: {repo.upstream or '(none)'}",
-        f"mode: {mode}",
     ]
+    if repo.push_target and repo.push_target != repo.upstream:
+        header.append(f"push target: {repo.push_target}")
+    header.append(f"mode: {mode}")
     print("\n".join([*header, "", *details]))
     return 0
 
